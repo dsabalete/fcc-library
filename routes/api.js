@@ -7,19 +7,12 @@
 */
 
 'use strict';
-
-const mongoose = require('mongoose');
-const Book = mongoose.model('Book', new mongoose.Schema({
-  title: { type: String, required: true },
-  comments: [String]
-}));
+const Book = require('../models/Book');
 
 module.exports = function (app) {
 
   app.route('/api/books')
     .get(async function (req, res) {
-      //response will be array of book objects
-      //json res format: [{"_id": bookid, "title": book_title, "commentcount": num_of_comments },...]
       try {
         const books = await Book.find();
         res.json(books.map(book => ({
@@ -63,9 +56,14 @@ module.exports = function (app) {
   app.route('/api/books/:id')
     .get(async function (req, res) {
       const bookid = req.params.id;
-      //json res format: {"_id": bookid, "title": book_title, "comments": [comment,comment,...]}
+
+      console.log('/api/books/:id bookid:', bookid);
+
       try {
         const book = await Book.findById(bookid);
+
+        console.log('book:', book);
+
         if (!book) {
           return res.status(404).send('no book exists');
         }
