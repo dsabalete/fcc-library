@@ -14,11 +14,12 @@
 		"dotenv": "^8.2.0",
 		"express": "^4.14.0",
 		"mocha": "^3.2.0",
+		"mongoose": "^8.10.0",
 		"zombie": "^5.0.5"
 	},
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/freeCodeCamp/boilerplate-project-library"
+		"url": "https://github.com/dsabalete/fcc-library"
 	},
 	"keywords": [
 		"node",
