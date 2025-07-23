@@ -20,7 +20,7 @@ module.exports = function (app) {
         res.json(books.map(book => ({
           _id: book._id.toString(),
           title: book.title,
-          comments: book.comments
+          commentcount: book.comments.length
         })));
       } catch (err) {
         res.status(500).send('Server error');
@@ -28,18 +28,15 @@ module.exports = function (app) {
     })
 
     .post(async function (req, res) {
-      if (!req.body || !('title' in req.body)) {
-        return res.status(400).send('missing required field title');
+      if (!req.body || !('title' in req.body) || req.body.title === '') {
+        return res.status(200).send('missing required field title');
       }
 
-      const title = req.body.title;
-      if (title === '') {
-        return res.status(400).send('missing required field title');
-      }
+      const { title } = req.body;
 
       try {
-        const newBook = await new Book({ title, comments: [] }).save();
-        res.json({ _id: newBook._id.toString(), title: newBook.title, comments: newBook.comments });
+        const newBook = await new Book({ title }).save();
+        res.json({ _id: newBook._id.toString(), title: newBook.title });
       } catch (err) {
         console.error('Error creating new book:', err);
         res.status(500).send('Server error');
@@ -63,15 +60,16 @@ module.exports = function (app) {
       const bookid = req.params.id;
 
       if (!mongoose.Types.ObjectId.isValid(bookid)) {
-        return res.status(404).send('no book exists');
+        return res.status(200).send('no book exists');
       }
 
       try {
         const book = await Book.findById(bookid);
 
         if (!book) {
-          return res.status(404).send('no book exists');
+          return res.status(200).send('no book exists');
         }
+
         res.json({ _id: book._id.toString(), title: book.title, comments: book.comments });
       } catch (err) {
         res.status(500).send('Server error');
@@ -83,18 +81,18 @@ module.exports = function (app) {
       const comment = req.body.comment;
 
       if (!mongoose.Types.ObjectId.isValid(bookid)) {
-        return res.status(404).send('no book exists');
+        return res.status(200).send('no book exists');
       }
 
       if (!comment) {
-        return res.status(400).send('missing required field comment');
+        return res.status(200).send('missing required field comment');
       }
 
       try {
         const book = await Book.findById(bookid);
 
         if (!book) {
-          return res.status(404).send('no book exists');
+          return res.status(200).send('no book exists');
         }
 
         book.comments.push(comment);
@@ -117,7 +115,7 @@ module.exports = function (app) {
         const book = await Book.findByIdAndDelete(bookid);
 
         if (!book) {
-          return res.status(404).send('no book exists');
+          return res.status(200).send('no book exists');
         }
 
         res.status(200).send('delete successful');
